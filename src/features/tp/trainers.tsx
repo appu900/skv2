@@ -23,8 +23,8 @@ import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useTrainingPartner } from "./use-training-partner";
 
-const OPTIONAL_FIELDS = ["educationQualification_1", "certification_course", "relevant_industryExperience"];
-const REQUIRED_FIELDS = ["name", "email", "phoneNumber", "PAN_CARD_NO", "AADHAR_NO", "PRN_NO", "state", "district", "city", "pincode"];
+const OPTIONAL_FIELDS = ["educationQualification_1", "relevant_industryExperience"];
+const REQUIRED_FIELDS = ["name", "email", "phoneNumber", "PAN_CARD_NO", "AADHAR_NO", "state", "district", "city", "pincode"];
 
 function CreateTrainerDialog({ disabled }: { disabled?: boolean }) {
   const sectors = useList<Sector>("/sector/all");
@@ -60,7 +60,6 @@ function CreateTrainerDialog({ disabled }: { disabled?: boolean }) {
         <Field label="Full name" name="name" required />
         <Field label="Email" name="email" type="email" required />
         <Field label="Phone" name="phoneNumber" type="tel" required />
-        <Field label="PRN number" name="PRN_NO" required />
         <Field label="PAN" name="PAN_CARD_NO" required />
         <Field label="Aadhaar" name="AADHAR_NO" required />
         <SelectField
@@ -90,7 +89,6 @@ function CreateTrainerDialog({ disabled }: { disabled?: boolean }) {
       <Separator />
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Highest qualification" name="educationQualification_1" />
-        <Field label="Certification course" name="certification_course" />
         <Field label="Industry experience" name="relevant_industryExperience" placeholder="e.g. 5 years" />
         <Field label="Photo" name="image" type="file" accept="image/*" />
       </div>

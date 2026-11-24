@@ -19,6 +19,7 @@ import { EmptyState } from "@/components/dashboard/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { InvoiceDownloadButton } from "@/components/shared/batch-invoices";
 import { useTrainingPartner } from "./use-training-partner";
 
 type Tab = "due" | "sna" | "review" | "paid";
@@ -148,6 +149,8 @@ export function PaymentsPage() {
                       )}
                     </TableCell>
                     <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                      {batch.amountToPaid ? <InvoiceDownloadButton batchId={batch._id} /> : null}
                       {tab === "due" ? (
                         batch.amountToPaid ? (
                           <UploadProofDialog batch={batch} />
@@ -157,6 +160,7 @@ export function PaymentsPage() {
                       ) : (
                         STATUS[tab]
                       )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

@@ -2,7 +2,7 @@
 export const THEME_KEY = "sap-theme";
 
 // Portals only: public pages (login, registration, verification) always stay light.
-export const THEMED_PATH = /^\/(admin|tp|aa|sna|lcrc|toa-assessor|toa)(\/|$)/;
+export const THEMED_PATH = /^\/(admin|tp|aa|sna|lcrc|toa-assessor|toa-admin|toa)(\/|$)/;
 
 // Runs in <head> before the first paint so a dark portal never flashes light.
 export const THEME_BOOT_SCRIPT = `try{if(${THEMED_PATH}.test(location.pathname)&&localStorage.getItem("${THEME_KEY}")==="dark"){document.documentElement.classList.add("dark");document.documentElement.style.colorScheme="dark"}}catch(e){}`;

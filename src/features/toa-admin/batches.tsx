@@ -98,7 +98,7 @@ export function ToaAdminBatchesPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="sm" asChild>
-                      <Link href={`/admin/toa/batches/${batch._id}`}>Open</Link>
+                      <Link href={`/toa-admin/batches/${batch._id}`}>Open</Link>
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -310,7 +310,7 @@ export function ToaAdminBatchDetailPage({ id }: { id: string }) {
   return (
     <div className="flex flex-col gap-6">
       <Button variant="ghost" size="sm" asChild className="-ml-2 w-fit text-muted-foreground">
-        <Link href="/admin/toa/batches">
+        <Link href="/toa-admin/batches">
           <ArrowLeft />
           All ToA batches
         </Link>

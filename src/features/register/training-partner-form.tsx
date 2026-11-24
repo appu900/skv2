@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Building2, Check, KeyRound, Layers, MailCheck, MapPin, SearchCheck, Users, type LucideIcon } from "lucide-react";
+import { Building2, Check, KeyRound, MailCheck, MapPin, SearchCheck, Users, type LucideIcon } from "lucide-react";
 import { api } from "@/lib/api/client";
 import type { Scheme } from "@/lib/api/models";
 import { useList } from "@/lib/api/use-list";
 import { formatDate } from "@/lib/domain/stages";
 import { STATES } from "@/lib/domain/states";
 import { Field, SelectField, TextareaField } from "@/components/shared/field";
-import { PATTERNS, PasswordFields, SectorCoursePicker, hasSector, list, validatePassword } from "@/components/register/common";
+import { PATTERNS, PasswordFields, validatePassword } from "@/components/register/common";
 import { FormSection, ReviewSection, StepForm, valueOf, type Step, type StepValues } from "@/components/register/step-form";
 import { Button } from "@/components/ui/button";
 
@@ -34,8 +34,7 @@ function toPayload(values: StepValues, schemes: Scheme[]) {
   payload.registeredOfficeEmail = String(payload.registeredOfficeEmail ?? "").toLowerCase();
   payload.scheme = valueOf(values, "scheme");
   payload.schemeType = schemes.find((scheme) => scheme.name === payload.scheme)?.schemeType;
-  payload.sector = values.sector ?? [];
-  payload.courses = values.courses ?? [];
+  // Sectors and courses are added from the profile after the admin approves the account.
   return payload;
 }
 
@@ -124,14 +123,6 @@ export function TrainingPartnerRegistration() {
       ),
     },
     {
-      title: "Sectors & courses",
-      icon: Layers,
-      description: "What you train in. You can add more later from your profile.",
-      multi: ["sector", "courses"],
-      validate: hasSector("sector"),
-      render: (values) => <SectorCoursePicker values={values} sectorName="sector" courseName="courses" />,
-    },
-    {
       title: "Account",
       icon: KeyRound,
       description: "Choose a password. You sign in with the office email and this password.",
@@ -145,7 +136,7 @@ export function TrainingPartnerRegistration() {
     <StepForm
       id="training-partner"
       title="Training partner"
-      subtitle="Apply to run skill training under the CUTM Awarding Body. Five short steps and a review. Your progress is saved on this device."
+      subtitle="Apply to run skill training under the CUTM Awarding Body. Four short steps and a review. Your progress is saved on this device."
       loginHref="/login/tp"
       steps={steps}
       review={(values, edit) => (
@@ -183,7 +174,6 @@ export function TrainingPartnerRegistration() {
               ["Project contact", joined(values, ["projectContactPersonName", "projectContactPersonMobile", "projectContactPersonEmail"])],
             ]}
           />
-          <ReviewSection title="Sectors & courses" onEdit={() => edit(3)} items={[["Sectors", list(values.sector)], ["Courses", list(values.courses)]]} />
         </>
       )}
       onSubmit={(values) => api.post("/tp", toPayload(values, schemeList))}
@@ -195,7 +185,7 @@ export function TrainingPartnerRegistration() {
 const NEXT_STEPS: { icon: LucideIcon; title: string; text: string }[] = [
   { icon: Check, title: "Application received", text: "Your details are saved with the awarding body." },
   { icon: SearchCheck, title: "Review", text: "The awarding body checks your application and documents." },
-  { icon: MailCheck, title: "Approval email", text: "You hear back by email once a decision is made." },
+  { icon: MailCheck, title: "Approval email", text: "You hear back by email once a decision is made, and can sign in after approval." },
 ];
 
 export function RegistrationDone({ login, what }: { login: string; what: string }) {
@@ -206,7 +196,7 @@ export function RegistrationDone({ login, what }: { login: string; what: string 
       </span>
       <h2 className="mt-6 text-2xl font-semibold tracking-tight">Application submitted</h2>
       <p className="mt-2 max-w-md text-sm text-muted-foreground">
-        Thank you. Every {what} application is reviewed by the awarding body. You can sign in now to follow its status.
+        Thank you. Every {what} application is reviewed by the awarding body. You can sign in once it is approved.
       </p>
 
       <ol className="mt-10 w-full max-w-md rounded-xl border bg-card p-5 text-left shadow-xs">

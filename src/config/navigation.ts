@@ -67,6 +67,7 @@ export const NAVIGATION: Record<PortalSlug, NavSection[]> = {
         { title: "Payments", href: "/admin/payments", icon: Wallet, summary: "Confirm corporate and government batch payments, set corporate amounts." },
         { title: "Exams", href: "/admin/exams", icon: CalendarCheck, summary: "Assign paid batches to assessment agencies and follow exam progress." },
         { title: "Certificates", href: "/admin/certificates", icon: Award, summary: "Publish certificates for completed exams and follow the generation job." },
+        { title: "Batch invoices", href: "/admin/batch-invoices", icon: Receipt, summary: "Payment invoices issued to training partners for submitted batches." },
         { title: "Agency invoices", href: "/admin/invoices", icon: Receipt, summary: "Monthly assessment agency invoices and their payment status." },
       ],
     },
@@ -78,6 +79,7 @@ export const NAVIGATION: Record<PortalSlug, NavSection[]> = {
         { title: "Certificate formats", href: "/admin/certificate-formats", icon: Award, summary: "Certificate format per training partner and scheme." },
         { title: "SNA accounts", href: "/admin/sna", icon: MapPinned, summary: "Create and list State Nodal Agency accounts." },
         { title: "LC/RC accounts", href: "/admin/lcrc", icon: Briefcase, summary: "Create LC/RC logins for corporate approvals; credentials are emailed." },
+        { title: "RailTel ToA admins", href: "/admin/toa-admins", icon: TrainFront, summary: "Create the separate logins that run the RailTel ToA module." },
         { title: "Notifications", href: "/admin/notifications", icon: Megaphone, summary: "Publish notices shown on the public site." },
         { title: "Admins", href: "/admin/admins", icon: ShieldCheck, summary: "Create additional admin accounts." },
       ],
@@ -89,20 +91,6 @@ export const NAVIGATION: Record<PortalSlug, NavSection[]> = {
         { title: "Offline batches", href: "/admin/offline/batches", icon: FileStack, summary: "Candidates, assessment, sheets and certificates of offline partners." },
         { title: "CUTM assessors", href: "/admin/offline/assessors", icon: IdCard, summary: "CUTM's own assessors and their ID cards." },
         { title: "Document formats", href: "/admin/offline/templates", icon: ScrollText, summary: "Certificate, attendance sheet, result sheet and ID card per partner and scheme." },
-      ],
-    },
-    {
-      title: "RailTel ToA",
-      items: [
-        { title: "ToA overview", href: "/admin/toa", icon: ChartColumn, summary: "Registrations, batches, money and certificates of the ToA programme." },
-        { title: "ToA training partners", href: "/admin/toa/training-partners", icon: TrainFront, summary: "Create, suspend and unlock RailTel ToA training partner accounts." },
-        { title: "Assessor applications", href: "/admin/toa/assessors", icon: UserRound, summary: "Verify, return or reject assessors registered by ToA partners." },
-        { title: "ToA batches", href: "/admin/toa/batches", icon: Layers, summary: "Approve batches and attendance, enter and publish results." },
-        { title: "ToA payments", href: "/admin/toa/payments", icon: Wallet, summary: "Invoices, online payments, receipts and refunds." },
-        { title: "ToA certificates", href: "/admin/toa/certificates", icon: Award, summary: "Issued certificates; correct, reissue or revoke." },
-        { title: "ToA reports", href: "/admin/toa/reports", icon: FileSpreadsheet, summary: "Filterable report with Excel and PDF export." },
-        { title: "ToA settings", href: "/admin/toa/settings", icon: SlidersHorizontal, summary: "Fees, eligibility rules and document templates." },
-        { title: "ToA audit log", href: "/admin/toa/audit-log", icon: ScrollText, summary: "Every login, change and approval in the ToA module." },
       ],
     },
   ],
@@ -124,6 +112,7 @@ export const NAVIGATION: Record<PortalSlug, NavSection[]> = {
       title: "Finance & results",
       items: [
         { title: "Payments", href: "/tp/payments", icon: Wallet, summary: "Batch fees, upload payment proof and track approval." },
+        { title: "Invoices", href: "/tp/invoices", icon: Receipt, summary: "Payment invoice of every submitted batch, as PDF." },
         { title: "Results & certificates", href: "/tp/results", icon: Award, summary: "Marksheets and certificates of completed batches." },
       ],
     },
@@ -160,21 +149,19 @@ export const NAVIGATION: Record<PortalSlug, NavSection[]> = {
   sna: [
     {
       items: [
-        { title: "Dashboard", href: "/sna", icon: LayoutDashboard, summary: "Pending centre and batch approvals for your state and scheme." },
+        { title: "Dashboard", href: "/sna", icon: LayoutDashboard, summary: "Pending centre approvals and certificates for your state and scheme." },
       ],
     },
     {
       title: "Approvals",
       items: [
         { title: "Centres", href: "/sna/centres", icon: School, summary: "Approve training centres for your scheme." },
-        { title: "Batch approvals", href: "/sna/batch-approvals", icon: ListChecks, summary: "Approve submitted government batches." },
       ],
     },
     {
-      title: "Monitoring",
+      title: "Records",
       items: [
-        { title: "Batches", href: "/sna/batches", icon: Layers, summary: "All active batches of your scheme with candidates and trainers." },
-        { title: "Results", href: "/sna/results", icon: ChartColumn, summary: "Marks and results of completed batches." },
+        { title: "Certificates & transcripts", href: "/sna/results", icon: Award, summary: "Certificates and mark transcripts of assessed batches in your scheme." },
       ],
     },
   ],
@@ -196,6 +183,28 @@ export const NAVIGATION: Record<PortalSlug, NavSection[]> = {
         { title: "Notifications", href: "/toa/notifications", icon: Bell, summary: "Decisions and updates from CUTM." },
         { title: "Profile", href: "/toa/profile", icon: Settings, summary: "Organisation details and password." },
       ],
+    },
+  ],
+  "toa-admin": [
+    {
+      items: [{ title: "Overview", href: "/toa-admin", icon: ChartColumn, summary: "Registrations, batches, money and certificates of the ToA programme." }],
+    },
+    {
+      title: "Programme",
+      items: [
+        { title: "Training partners", href: "/toa-admin/training-partners", icon: TrainFront, summary: "Create, suspend and unlock RailTel ToA training partner accounts." },
+        { title: "Assessor applications", href: "/toa-admin/assessors", icon: UserRound, summary: "Verify, return or reject assessors registered by ToA partners." },
+        { title: "Batches", href: "/toa-admin/batches", icon: Layers, summary: "Approve batches and attendance, enter and publish results." },
+        { title: "Payments", href: "/toa-admin/payments", icon: Wallet, summary: "Invoices, online payments, receipts and refunds." },
+        { title: "Certificates", href: "/toa-admin/certificates", icon: Award, summary: "Issued certificates; correct, reissue or revoke." },
+        { title: "Reports", href: "/toa-admin/reports", icon: FileSpreadsheet, summary: "Filterable report with Excel and PDF export." },
+        { title: "Settings", href: "/toa-admin/settings", icon: SlidersHorizontal, summary: "Fees, eligibility rules and document templates." },
+        { title: "Audit log", href: "/toa-admin/audit-log", icon: ScrollText, summary: "Every login, change and approval in the ToA module." },
+      ],
+    },
+    {
+      title: "Account",
+      items: [{ title: "Profile", href: "/toa-admin/profile", icon: Settings, summary: "Your login and password." }],
     },
   ],
   "toa-assessor": [

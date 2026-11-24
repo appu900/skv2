@@ -1,9 +1,9 @@
 // Roles as issued by the backend inside the JWT (`role` claim).
-export const ROLES = ["Admin", "TrainingPartner", "AssesmentAgency", "SNA", "LCRC", "ToaTrainingPartner", "ToaAssessor"] as const;
+export const ROLES = ["Admin", "TrainingPartner", "AssesmentAgency", "SNA", "LCRC", "ToaTrainingPartner", "ToaAssessor", "ToaAdmin"] as const;
 export type Role = (typeof ROLES)[number];
 
 // URL segment used for each portal, e.g. /tp/batches.
-export type PortalSlug = "admin" | "tp" | "aa" | "sna" | "lcrc" | "toa" | "toa-assessor";
+export type PortalSlug = "admin" | "tp" | "aa" | "sna" | "lcrc" | "toa" | "toa-assessor" | "toa-admin";
 
 export interface RoleConfig {
   role: Role;
@@ -81,6 +81,15 @@ export const ROLE_CONFIG: Record<PortalSlug, RoleConfig> = {
     label: "RailTel ToA assessor",
     description: "Assessors trained under RailTel ToA: attendance, results and certificates",
     loginPath: "/toa/assessor/login",
+    emailField: "email",
+    forgotPassword: true,
+  },
+  "toa-admin": {
+    role: "ToaAdmin",
+    slug: "toa-admin",
+    label: "RailTel ToA admin",
+    description: "Runs the RailTel ToA module: partners, assessors, batches, payments and certificates",
+    loginPath: "/toa/admin/login",
     emailField: "email",
     forgotPassword: true,
   },

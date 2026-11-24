@@ -409,3 +409,36 @@ export interface Notice {
   expiredAt: string;
   createdAt?: string;
 }
+
+// Payment invoice of a submitted batch (issued on submit, cancelled if the batch is sent back).
+export interface BatchInvoice {
+  _id: string;
+  invoiceNumber: string;
+  issuedAt?: string;
+  candidates: number;
+  ratePerCandidate: number;
+  subtotal: number;
+  gstPercent: number;
+  gstAmount: number;
+  amount: number;
+  paymentStatus: boolean;
+  transactionId?: string;
+  cancelled?: boolean;
+  cancelReason?: string;
+  BatchId?: Pick<Batch, "_id" | "ABN_Number" | "courseName" | "centerName" | "scheme" | "schemeType" | "startDate" | "endDate"> | null;
+  TrainingPartnerId?: { _id: string; organizationName?: string; tpCode?: string } | null;
+}
+
+// RailTel ToA admin login, created by the CUTM admin.
+export interface ToaAdminAccount {
+  _id: string;
+  name: string;
+  email: string;
+  mobile?: string;
+  status: "active" | "suspended" | "deactivated";
+  statusReason?: string | null;
+  mustChangePassword?: boolean;
+  lockUntil?: string | null;
+  lastLoginAt?: string | null;
+  createdAt?: string;
+}

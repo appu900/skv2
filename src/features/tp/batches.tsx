@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Eye, Layers, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api/client";
-import type { Batch, Centre, Course, Scheme } from "@/lib/api/models";
+import type { Batch, Centre, Course } from "@/lib/api/models";
 import { useApiMutation } from "@/lib/api/use-api-mutation";
 import { useList } from "@/lib/api/use-list";
 import { batchStage, formatDate } from "@/lib/domain/stages";
@@ -33,37 +33,29 @@ const tabOf = (batch: Batch): Exclude<Tab, "all"> => {
   return "running";
 };
 
-// A centre can run a scheme once it is approved there (by the SNA, or the LC/RC for corporate schemes).
-function eligibleSchemes(centre: Centre | undefined, schemes: Scheme[]) {
-  if (!centre) return [];
-  return centre.schemes
-    .map((entry) => ({ entry, scheme: schemes.find((scheme) => scheme.name === entry.schemeName) }))
-    .filter(({ entry, scheme }) => scheme && entry.approveStatus)
-    .map(({ scheme }) => scheme as Scheme);
-}
+// A batch runs the scheme the TP chose at signup, on a centre approved for it (SNA, or LC/RC for corporate).
+const approvedFor = (centre: Centre, scheme?: string) =>
+  Boolean(scheme) && centre.schemes.some((entry) => entry.schemeName === scheme && entry.approveStatus);
 
-function CreateBatchDialog({ centres, disabled }: { centres: Centre[]; disabled?: boolean }) {
-  const schemes = useList<Scheme>("/scheme");
+function CreateBatchDialog({ centres, scheme, disabled }: { centres: Centre[]; scheme?: string; disabled?: boolean }) {
   const courses = useList<Course>("/course/course");
   const [centreId, setCentreId] = useState("");
-  const [schemeName, setSchemeName] = useState("");
   const [courseId, setCourseId] = useState("");
   const create = useApiMutation((body: Record<string, unknown>) => api.post("/batch/create", body), (result) => {
     const abn = (result as { data?: { data?: Batch } }).data?.data?.ABN_Number;
     return abn ? `Batch ${abn} created` : "Batch created";
   });
 
-  const centre = centres.find((item) => item._id === centreId);
-  const allowedSchemes = eligibleSchemes(centre, schemes.data ?? []);
+  const readyCentres = centres.filter((item) => approvedFor(item, scheme));
+  const waitingCentres = centres.length - readyCentres.length;
+  const centre = readyCentres.find((item) => item._id === centreId);
   const centreCourseIds = new Set(
     (centre?.sectors ?? []).flatMap((sector) => (typeof sector === "object" ? (sector.courses ?? []).map((course) => course._id) : []))
   );
   const courseOptions = (courses.data ?? []).filter((course) => centreCourseIds.size === 0 || centreCourseIds.has(course._id));
-  const pendingSchemes = (centre?.schemes.length ?? 0) - allowedSchemes.length;
 
   const reset = () => {
     setCentreId("");
-    setSchemeName("");
     setCourseId("");
   };
 
@@ -77,15 +69,14 @@ function CreateBatchDialog({ centres, disabled }: { centres: Centre[]; disabled?
         </Button>
       }
       title="Create a batch"
-      description="Pick the centre first; schemes and courses follow from it. You add candidates and trainers next."
+      description={`${scheme ? `${scheme} batch. ` : ""}Pick the centre first; courses follow from it. You add candidates and trainers next.`}
       submitLabel="Create batch"
       onSubmit={async (form) => {
-        const scheme = allowedSchemes.find((item) => item.name === schemeName);
         const course = courseOptions.find((item) => item._id === courseId);
         const startDate = String(form.get("startDate"));
         const endDate = String(form.get("endDate"));
-        if (!centre || !scheme || !course) {
-          toast.error("Choose a centre, scheme and course");
+        if (!centre || !course) {
+          toast.error("Choose a centre and a course");
           throw new Error("incomplete");
         }
         if (endDate < startDate) {
@@ -97,8 +88,6 @@ function CreateBatchDialog({ centres, disabled }: { centres: Centre[]; disabled?
           centerName: centre.name,
           CenterCode: centre.centerId,
           state: centre.state,
-          scheme: scheme.name,
-          schemeType: scheme.schemeType,
           courseName: course.courseName,
           courseCode: course.courseCode,
           sectorName: course.sectorName,
@@ -118,22 +107,12 @@ function CreateBatchDialog({ centres, disabled }: { centres: Centre[]; disabled?
         value={centreId}
         onValueChange={(value) => {
           setCentreId(value);
-          setSchemeName("");
           setCourseId("");
         }}
-        options={centres.map((item) => ({ value: item._id, label: `${item.name} (${item.centerId}) · ${item.state}` }))}
+        options={readyCentres.map((item) => ({ value: item._id, label: `${item.name} (${item.centerId}) · ${item.state}` }))}
+        hint={waitingCentres > 0 ? `${waitingCentres} centre(s) still wait for approval` : undefined}
       />
       <div className="grid gap-4 sm:grid-cols-2">
-        <SelectField
-          label="Scheme"
-          name="scheme"
-          required
-          value={schemeName}
-          onValueChange={setSchemeName}
-          placeholder={centre ? "Select…" : "Pick a centre first"}
-          options={allowedSchemes.map((scheme) => ({ value: scheme.name, label: `${scheme.name} · ${scheme.schemeType}` }))}
-          hint={pendingSchemes > 0 ? `${pendingSchemes} scheme(s) of this centre still wait for approval` : undefined}
-        />
         <SelectField
           label="Course"
           name="course"
@@ -142,13 +121,14 @@ function CreateBatchDialog({ centres, disabled }: { centres: Centre[]; disabled?
           onValueChange={setCourseId}
           placeholder={centre ? "Select…" : "Pick a centre first"}
           options={courseOptions.map((course) => ({ value: course._id, label: `${course.courseName} (${course.courseCode})` }))}
+          className="sm:col-span-2"
         />
         <Field label="Training starts" name="startDate" type="date" required />
         <Field label="Training ends" name="endDate" type="date" required />
       </div>
-      {centre && allowedSchemes.length === 0 && (
+      {readyCentres.length === 0 && (
         <Alert>
-          <AlertDescription>None of this centre&apos;s schemes is approved yet, so no batch can be created here.</AlertDescription>
+          <AlertDescription>None of your centres is approved yet, so no batch can be created.</AlertDescription>
         </Alert>
       )}
     </FormDialog>
@@ -156,7 +136,7 @@ function CreateBatchDialog({ centres, disabled }: { centres: Centre[]; disabled?
 }
 
 export function BatchesPage() {
-  const { tpId, approved } = useTrainingPartner();
+  const { tpId, approved, profile } = useTrainingPartner();
   const [tab, setTab] = useState<Tab>("all");
   const [search, setSearch] = useState("");
   const batches = useList<Batch>(tpId ? `/batch/tp/${tpId}` : null);
@@ -173,7 +153,7 @@ export function BatchesPage() {
       <PageHeader
         title="Batches"
         description="Create a batch, add candidates (with photos) and trainers, then submit it for assessment."
-        actions={<CreateBatchDialog centres={centres.data ?? []} disabled={!approved} />}
+        actions={<CreateBatchDialog centres={centres.data ?? []} scheme={profile.data?.scheme} disabled={!approved} />}
       />
       <ListCard
         toolbar={

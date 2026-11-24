@@ -22,7 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { actionLabel } from "./toa-audit-log";
+import { actionLabel } from "./audit-log";
 
 type Tab = "active" | "suspended" | "deactivated" | "all";
 
@@ -237,7 +237,7 @@ function TpSheet({ tp }: { tp: ToaTrainingPartner }) {
                   <li key={entry._id} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
                     <span>
                       {actionLabel(entry.action)}
-                      {entry.actorRole === "Admin" && <span className="text-muted-foreground"> · by admin</span>}
+                      {(entry.actorRole === "Admin" || entry.actorRole === "ToaAdmin") && <span className="text-muted-foreground"> · by admin</span>}
                     </span>
                     <span className="shrink-0 text-xs text-muted-foreground">{new Date(entry.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</span>
                   </li>

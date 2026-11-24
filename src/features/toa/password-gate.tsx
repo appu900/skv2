@@ -8,8 +8,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ToaPasswordForm } from "./password-form";
 
 // Accounts get a temporary password from CUTM; nothing else of the portal opens until it is replaced.
-export function ToaPasswordGate({ children }: { children: React.ReactNode }) {
-  const { data, isLoading } = useItem<ToaTrainingPartner>("/toa/tp/me");
+export function ToaPasswordGate({ children, portal = "toa" }: { children: React.ReactNode; portal?: "toa" | "toa-admin" }) {
+  const { data, isLoading } = useItem<Pick<ToaTrainingPartner, "mustChangePassword">>(portal === "toa-admin" ? "/toa/admin/me" : "/toa/tp/me");
 
   if (isLoading || !data) {
     return (
@@ -34,7 +34,7 @@ export function ToaPasswordGate({ children }: { children: React.ReactNode }) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ToaPasswordForm submitLabel="Save and continue" />
+          <ToaPasswordForm submitLabel="Save and continue" portal={portal} />
         </CardContent>
       </Card>
     </div>

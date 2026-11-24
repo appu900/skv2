@@ -50,7 +50,7 @@ export function History({ entries }: { entries: { status: string; remarks?: stri
           <span className="absolute top-1.5 -left-[21px] size-2 rounded-full bg-primary" />
           <p className="font-medium capitalize">
             {entry.status.replaceAll("_", " ")}
-            <span className="font-normal text-muted-foreground"> · {entry.byRole === "Admin" ? "CUTM" : "Training partner"}</span>
+            <span className="font-normal text-muted-foreground"> · {entry.byRole === "Admin" || entry.byRole === "ToaAdmin" ? "CUTM" : "Training partner"}</span>
           </p>
           {entry.reference && <p className="text-xs text-muted-foreground">Ref. {entry.reference}</p>}
           {entry.remarks && <p className="text-muted-foreground">“{entry.remarks}”</p>}

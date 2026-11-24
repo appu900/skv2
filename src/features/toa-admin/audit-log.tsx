@@ -120,7 +120,7 @@ export function ToaAuditLogPage() {
                     <Badge variant={WARNING.has(entry.action) ? "warning" : "secondary"}>{actionLabel(entry.action)}</Badge>
                   </TableCell>
                   <TableCell className="hidden md:table-cell">{(entry.entityId && names.get(entry.entityId)) || "—"}</TableCell>
-                  <TableCell className="hidden sm:table-cell">{entry.actorRole === "Admin" ? "Admin" : entry.actorRole === "ToaTrainingPartner" ? "Partner" : "—"}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{entry.actorRole === "Admin" || entry.actorRole === "ToaAdmin" ? "Admin" : entry.actorRole === "ToaTrainingPartner" ? "Partner" : entry.actorRole === "ToaAssessor" ? "Assessor" : "—"}</TableCell>
                   <TableCell className="hidden max-w-80 lg:table-cell">
                     <Changes entry={entry} />
                   </TableCell>

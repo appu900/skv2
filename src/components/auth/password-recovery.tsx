@@ -19,7 +19,7 @@ const usePortal = () => {
 };
 
 // The backend paths of each portal's recovery endpoints.
-const RECOVERY_PATH: Record<string, string> = { toa: "/toa/tp", "toa-assessor": "/toa/assessor" };
+const RECOVERY_PATH: Record<string, string> = { toa: "/toa/tp", "toa-assessor": "/toa/assessor", "toa-admin": "/toa/admin" };
 
 function BackToLogin({ portal }: { portal: string }) {
   return (

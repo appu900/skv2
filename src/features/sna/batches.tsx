@@ -43,10 +43,10 @@ function SnaBatchList({ results }: { results?: boolean }) {
   return (
     <>
       <PageHeader
-        title={results ? "Results" : "Batches"}
+        title={results ? "Certificates & transcripts" : "Batches"}
         description={
           results
-            ? "Marks and certificates of assessed batches in your scheme."
+            ? "Certificates and mark transcripts of assessed batches in your scheme."
             : `Every submitted ${session?.scheme ?? ""} batch in ${session?.state ?? "your state"}, with candidates and trainers.`
         }
       />

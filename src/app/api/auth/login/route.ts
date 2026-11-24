@@ -42,6 +42,7 @@ function extractProfile(portal: string, data: LoginResponseData) {
     case "toa":
       return { name: data.data?.organizationName, email: data.data?.email };
     case "toa-assessor":
+    case "toa-admin":
       return { name: data.data?.name, email: data.data?.email };
     default:
       return {};

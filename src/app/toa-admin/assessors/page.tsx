@@ -1,4 +1,4 @@
-import { ToaAssessorApplicationsPage } from "@/features/admin/toa/assessors";
+import { ToaAssessorApplicationsPage } from "@/features/toa-admin/assessors";
 
 export default function Page() {
   return <ToaAssessorApplicationsPage />;

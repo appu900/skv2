@@ -17,7 +17,7 @@ export const PORTAL_INFO: Record<PortalSlug, { icon: LucideIcon; features: strin
   },
   sna: {
     icon: MapPinned,
-    features: ["Approve training centres", "Approve government batches", "Monitor batches of your scheme", "Review results"],
+    features: ["Approve training centres", "View certificates", "View mark transcripts"],
   },
   lcrc: {
     icon: Briefcase,
@@ -26,6 +26,10 @@ export const PORTAL_INFO: Record<PortalSlug, { icon: LucideIcon; features: strin
   toa: {
     icon: TrainFront,
     features: ["Register assessors for training", "Form and submit batches", "Record attendance", "Pay fees and download certificates"],
+  },
+  "toa-admin": {
+    icon: ShieldCheck,
+    features: ["Create and suspend ToA training partners", "Verify assessors and approve batches", "Approve attendance and publish results", "Invoices, payments and certificates"],
   },
   "toa-assessor": {
     icon: Award,

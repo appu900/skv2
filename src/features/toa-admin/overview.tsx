@@ -52,15 +52,15 @@ export function ToaOverviewPage() {
         description="Training of Assessors programme: registrations, batches, money and certificates."
         actions={
           <Button variant="outline" asChild>
-            <Link href="/admin/toa/reports">Reports</Link>
+            <Link href="/toa-admin/reports">Reports</Link>
           </Button>
         }
       />
       <StatGrid>
-        <StatCard label="Applications to verify" value={data?.registrations.pending} hint={`${data?.registrations.total ?? 0} registered in all`} icon={Users} tone="warning" href="/admin/toa/assessors" loading={loading} />
-        <StatCard label="Batches to review" value={data?.batches.submitted} hint={`${data?.batches.approved ?? 0} running`} icon={Layers} tone="warning" href="/admin/toa/batches" loading={loading} />
-        <StatCard label="Collected" value={data ? formatCurrency(data.finance.collected) : undefined} hint={`${data ? formatCurrency(data.finance.pending) : "—"} outstanding`} icon={Wallet} tone="success" href="/admin/toa/payments" loading={loading} />
-        <StatCard label="Certificates issued" value={data?.certification.certificatesIssued} hint={`results pending for ${data?.certification.resultsPending ?? 0} batch(es)`} icon={Award} tone="info" href="/admin/toa/certificates" loading={loading} />
+        <StatCard label="Applications to verify" value={data?.registrations.pending} hint={`${data?.registrations.total ?? 0} registered in all`} icon={Users} tone="warning" href="/toa-admin/assessors" loading={loading} />
+        <StatCard label="Batches to review" value={data?.batches.submitted} hint={`${data?.batches.approved ?? 0} running`} icon={Layers} tone="warning" href="/toa-admin/batches" loading={loading} />
+        <StatCard label="Collected" value={data ? formatCurrency(data.finance.collected) : undefined} hint={`${data ? formatCurrency(data.finance.pending) : "—"} outstanding`} icon={Wallet} tone="success" href="/toa-admin/payments" loading={loading} />
+        <StatCard label="Certificates issued" value={data?.certification.certificatesIssued} hint={`results pending for ${data?.certification.resultsPending ?? 0} batch(es)`} icon={Award} tone="info" href="/toa-admin/certificates" loading={loading} />
       </StatGrid>
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <ApprovalCard

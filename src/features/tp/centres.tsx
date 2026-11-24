@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Eye, Pencil, Plus, School } from "lucide-react";
-import { toast } from "sonner";
 import { api } from "@/lib/api/client";
 import type { Centre, CentreSector, Scheme, Sector } from "@/lib/api/models";
 import { useApiMutation } from "@/lib/api/use-api-mutation";
@@ -52,7 +51,8 @@ function SchemeBadges({ centre, schemes }: { centre: Centre; schemes: Scheme[] }
   );
 }
 
-function CreateCentreDialog({ schemes, sectors, disabled }: { schemes: Scheme[]; sectors: Sector[]; disabled?: boolean }) {
+// Every centre runs the scheme the TP chose at signup; the backend sets it.
+function CreateCentreDialog({ scheme, sectors, disabled }: { scheme?: string; sectors: Sector[]; disabled?: boolean }) {
   const create = useApiMutation((form: FormData) => api.post("/center", form), "Centre created and sent for approval");
 
   return (
@@ -65,16 +65,11 @@ function CreateCentreDialog({ schemes, sectors, disabled }: { schemes: Scheme[];
         </Button>
       }
       title="Add a training centre"
-      description="Each scheme you pick is sent to that state's SNA for approval."
+      description={scheme ? `The centre runs ${scheme} and is sent for approval.` : "The centre is sent for approval."}
       submitLabel="Create centre"
       onSubmit={async (form) => {
-        if (!form.getAll("schemes").length) {
-          toast.error("Pick at least one scheme");
-          throw new Error("no scheme");
-        }
         const body = new FormData();
-        for (const key of ["name", "centerId", "projectId", "PRN_NO", "state"]) body.append(key, String(form.get(key) ?? ""));
-        form.getAll("schemes").forEach((scheme, index) => body.append(`schemes[${index}][schemeName]`, String(scheme)));
+        for (const key of ["name", "centerId", "projectId", "state"]) body.append(key, String(form.get(key) ?? ""));
         form.getAll("sectors").forEach((sector) => body.append("sectors[]", String(sector)));
         body.append("letter", form.get("letter") as File);
         await create.mutateAsync(body);
@@ -84,17 +79,9 @@ function CreateCentreDialog({ schemes, sectors, disabled }: { schemes: Scheme[];
         <Field label="Centre name" name="name" required />
         <Field label="Centre code" name="centerId" required hint="Printed on certificates" />
         <Field label="Project ID" name="projectId" required />
-        <Field label="PRN number" name="PRN_NO" required />
         <SelectField label="State" name="state" required options={STATES} />
         <Field label="Sanction order letter" name="letter" type="file" accept=".pdf,image/*" required />
       </div>
-      <CheckboxGroup
-        label="Schemes"
-        name="schemes"
-        required
-        options={schemes.map((scheme) => ({ value: scheme.name, label: scheme.name, description: `${scheme.schemeType} · ${scheme.state}` }))}
-        emptyText="No schemes have been created yet"
-      />
       <CheckboxGroup label="Sectors" name="sectors" options={sectors.map((sector) => ({ value: sector._id, label: sector.name }))} />
     </FormDialog>
   );
@@ -113,7 +100,7 @@ function EditCentreDialog({ centre, sectors }: { centre: Centre; sectors: Sector
         </Button>
       }
       title={`Edit ${centre.name}`}
-      description="State, PRN and schemes are fixed once the centre is created."
+      description="State and scheme are fixed once the centre is created."
       onSubmit={(form) =>
         update.mutateAsync({
           name: form.get("name"),
@@ -160,7 +147,7 @@ function CentreSheet({ centre, schemes }: { centre: Centre; schemes: Scheme[] })
             items={[
               ["Centre code", centre.centerId],
               ["Project ID", centre.projectId],
-              ["PRN number", centre.PRN_NO],
+              ...(centre.PRN_NO ? [["PRN number", centre.PRN_NO] as [string, React.ReactNode]] : []),
               ["State", centre.state],
             ]}
           />
@@ -208,7 +195,7 @@ function CentreSheet({ centre, schemes }: { centre: Centre; schemes: Scheme[] })
 }
 
 export function CentresPage() {
-  const { tpId, approved } = useTrainingPartner();
+  const { tpId, approved, profile } = useTrainingPartner();
   const [search, setSearch] = useState("");
   const centres = useList<Centre>(tpId ? `/center/tp/${tpId}` : null);
   const schemes = useList<Scheme>("/scheme");
@@ -220,8 +207,8 @@ export function CentresPage() {
     <>
       <PageHeader
         title="Centres"
-        description="Your training centres and the approval of each scheme (SNA for government, LC/RC for corporate). Batches need an approved centre."
-        actions={<CreateCentreDialog schemes={schemes.data ?? []} sectors={sectors.data ?? []} disabled={!approved} />}
+        description="Your training centres and their approval (SNA for government, LC/RC for corporate). Add as many as you need; batches need an approved centre."
+        actions={<CreateCentreDialog scheme={profile.data?.scheme} sectors={sectors.data ?? []} disabled={!approved} />}
       />
       <ListCard toolbar={<SearchInput value={search} onChange={setSearch} placeholder="Search centres…" />}>
         {!tpId || centres.isLoading ? (

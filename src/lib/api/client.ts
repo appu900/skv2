@@ -10,7 +10,7 @@ api.interceptors.response.use(
     // Session expired or revoked: back to the login page of the current portal.
     if (error.response?.status === 401 && typeof window !== "undefined") {
       const portal = window.location.pathname.split("/")[1];
-      if (["admin", "tp", "aa", "sna", "lcrc", "toa", "toa-assessor"].includes(portal)) {
+      if (["admin", "tp", "aa", "sna", "lcrc", "toa", "toa-assessor", "toa-admin"].includes(portal)) {
         // full reload on purpose: drops every cached query of the expired session
         // eslint-disable-next-line @next/next/no-location-assign-relative-destination
         window.location.href = `/login/${portal}?next=${encodeURIComponent(window.location.pathname)}`;

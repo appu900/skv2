@@ -3,13 +3,13 @@ import { BACKEND_API_URL } from "@/lib/server/config";
 import { decodeJwt } from "@/lib/auth/jwt";
 import { SESSION_COOKIE, sessionCookieOptions } from "@/lib/auth/session-cookie";
 
-// Changing a ToA password (training partner or assessor) ends the old session on the backend, so the new token has to replace the cookie here.
+// Changing a ToA password (training partner, assessor or ToA admin) ends the old session on the backend, so the new token has to replace the cookie here.
 export async function PUT(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE)?.value;
   if (!token) return NextResponse.json({ success: false, message: "Not logged in" }, { status: 401 });
 
   const { portal, ...body } = (await request.json().catch(() => ({}))) as { portal?: string };
-  const path = portal === "toa-assessor" ? "/toa/assessor/me/password" : "/toa/tp/me/password";
+  const path = portal === "toa-assessor" ? "/toa/assessor/me/password" : portal === "toa-admin" ? "/toa/admin/me/password" : "/toa/tp/me/password";
   const backendResponse = await fetch(`${BACKEND_API_URL}${path}`, {
     method: "PUT",
     headers: { "content-type": "application/json", "x-access-token": token },

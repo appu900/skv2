@@ -13,7 +13,7 @@ export const PASSWORD_RULE = "8–64 characters with at least one letter and one
 export const strongEnough = (value: string) => value.length >= 8 && value.length <= 64 && /[A-Za-z]/.test(value) && /\d/.test(value);
 
 // Goes through /api/auth/toa-password: the backend ends the old session, so the cookie gets the new token there.
-export function ToaPasswordForm({ submitLabel = "Change password", onDone, portal = "toa" }: { submitLabel?: string; onDone?: () => void; portal?: "toa" | "toa-assessor" }) {
+export function ToaPasswordForm({ submitLabel = "Change password", onDone, portal = "toa" }: { submitLabel?: string; onDone?: () => void; portal?: "toa" | "toa-assessor" | "toa-admin" }) {
   const queryClient = useQueryClient();
   const [pending, setPending] = useState(false);
 
