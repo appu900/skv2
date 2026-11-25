@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -8,6 +8,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { ArrowRight, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import { ROLE_CONFIG, type PortalSlug } from "@/lib/auth/roles";
+import { useSession } from "@/lib/auth/use-session";
 import { getErrorMessage } from "@/lib/api/client";
 import { APPLICATION_NOT_APPROVED, type ApiErrorBody } from "@/lib/api/types";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,23 @@ export function LoginForm({ portal }: { portal: PortalSlug }) {
   const queryClient = useQueryClient();
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const session = useSession();
+
+  // Back after logging in brings this page out of the cache: a signed-in user goes straight to the portal
+  useEffect(() => {
+    if (session.data?.portal !== portal) return;
+    const next = searchParams.get("next");
+    router.replace(next && next.startsWith(`/${portal}`) ? next : `/${portal}`);
+  }, [session.data?.portal, portal, router, searchParams]);
+
+  // a page restored from the back/forward cache must not keep the spinner of the earlier sign-in
+  useEffect(() => {
+    const reset = (event: PageTransitionEvent) => {
+      if (event.persisted) setSubmitting(false);
+    };
+    window.addEventListener("pageshow", reset);
+    return () => window.removeEventListener("pageshow", reset);
+  }, []);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

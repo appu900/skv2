@@ -10,7 +10,15 @@ export function proxy(request: NextRequest) {
 
   // /login/<unknown> -> portal chooser (dynamicParams is not available with cacheComponents)
   if (section === "login") {
-    return isPortalSlug(portal) ? NextResponse.next() : NextResponse.redirect(new URL("/login", request.url));
+    if (!isPortalSlug(portal)) return NextResponse.redirect(new URL("/login", request.url));
+    // already signed in to this portal (e.g. the Back button after logging in): straight back to it
+    const session = request.cookies.get(SESSION_COOKIE)?.value;
+    const signedIn = session ? decodeJwt(session) : null;
+    if (signedIn && !isExpired(signedIn) && signedIn.role === ROLE_CONFIG[portal].role) {
+      const next = request.nextUrl.searchParams.get("next");
+      return NextResponse.redirect(new URL(next && next.startsWith(`/${portal}`) ? next : `/${portal}`, request.url));
+    }
+    return NextResponse.next();
   }
 
   if (!isPortalSlug(section)) {

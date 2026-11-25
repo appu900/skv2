@@ -24,7 +24,7 @@ export default async function LoginPage({ params }: PageProps<"/login/[role]">) 
   if (!isPortalSlug(role)) notFound();
   const config = ROLE_CONFIG[role];
   const info = PORTAL_INFO[role];
-  const others = Object.values(ROLE_CONFIG).filter((item) => item.slug !== role);
+  const others = Object.values(ROLE_CONFIG).filter((item) => item.slug !== role && !item.hidden);
 
   return (
     <AuthSplit
