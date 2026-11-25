@@ -21,6 +21,7 @@ import { EmptyState } from "@/components/dashboard/empty-state";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { fileUrl } from "@/lib/api/files";
 
 // No assessment agency in AMASY (client, 2026-11-24): CUTM conducts every assessment itself.
 function StartAssessmentDialog() {
@@ -109,9 +110,9 @@ function ExamDocuments({ exam }: { exam: Exam }) {
           {exam.images && exam.images.length > 0 && (
             <div className="grid grid-cols-3 gap-2">
               {exam.images.map((image) => (
-                <a key={image} href={image} target="_blank" rel="noreferrer">
+                <a key={image} href={fileUrl(image)} target="_blank" rel="noreferrer">
                   {/* eslint-disable-next-line @next/next/no-img-element -- remote S3 images of unknown size */}
-                  <img src={image} alt="Assessment photo" className="aspect-square w-full rounded-md object-cover" />
+                  <img src={fileUrl(image)} alt="Assessment photo" className="aspect-square w-full rounded-md object-cover" />
                 </a>
               ))}
             </div>

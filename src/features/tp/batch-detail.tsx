@@ -42,6 +42,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddCandidateDialog, AddTrainersDialog, PhotoUpload, ReturnedNotice, SubmitChecklist } from "./batch-manage";
+import { fileUrl } from "@/lib/api/files";
 
 const initials = (name: string) =>
   name
@@ -130,7 +131,7 @@ function CandidateSheet({ student, editable, onOpenChange }: { student: Student 
             <div className="flex flex-col gap-6 px-6 pb-8">
               <div className="-mt-14 flex items-end justify-between gap-4">
                 <Avatar className="size-28 rounded-2xl border-4 border-background shadow-lg">
-                  {student.profilepic && <AvatarImage src={student.profilepic} alt={student.name} className="rounded-2xl object-cover" />}
+                  {student.profilepic && <AvatarImage src={fileUrl(student.profilepic)} alt={student.name} className="rounded-2xl object-cover" />}
                   <AvatarFallback className="rounded-2xl bg-primary/10 text-2xl font-semibold text-primary">{initials(student.name)}</AvatarFallback>
                 </Avatar>
                 {editable && <PhotoUpload student={student} />}
@@ -237,7 +238,7 @@ function CandidateCard({ student, onOpen }: { student: Student; onOpen: () => vo
       className="group flex items-center gap-4 rounded-xl border bg-card p-4 text-left shadow-xs transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
     >
       <Avatar className="size-14 rounded-xl">
-        {student.profilepic && <AvatarImage src={student.profilepic} alt="" className="rounded-xl object-cover" />}
+        {student.profilepic && <AvatarImage src={fileUrl(student.profilepic)} alt="" className="rounded-xl object-cover" />}
         <AvatarFallback className="rounded-xl bg-primary/10 font-semibold text-primary">{initials(student.name)}</AvatarFallback>
       </Avatar>
       <div className="min-w-0 flex-1">
@@ -400,7 +401,7 @@ export function BatchDetailPage({ id }: { id: string }) {
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar className="size-9">
-                              {trainer.profilePic && <AvatarImage src={trainer.profilePic} alt="" className="object-cover" />}
+                              {trainer.profilePic && <AvatarImage src={fileUrl(trainer.profilePic)} alt="" className="object-cover" />}
                               <AvatarFallback className="text-xs">{initials(trainer.name)}</AvatarFallback>
                             </Avatar>
                             <div>

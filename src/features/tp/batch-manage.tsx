@@ -25,6 +25,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { fileUrl } from "@/lib/api/files";
 
 const GENDERS = ["Male", "Female", "Transgender"];
 const CATEGORIES = ["General", "OBC", "SC", "ST", "EWS"];
@@ -311,7 +312,7 @@ function ManageContent({ id }: { id: string }) {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="size-8">
-                        {student.profilepic && <AvatarImage src={student.profilepic} alt="" />}
+                        {student.profilepic && <AvatarImage src={fileUrl(student.profilepic)} alt="" />}
                         <AvatarFallback className="text-xs">{student.name.slice(0, 2).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <div>

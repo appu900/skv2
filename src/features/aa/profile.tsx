@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAgency } from "./use-agency";
+import { fileUrl } from "@/lib/api/files";
 
 function InfoItem({ icon: Icon, label, children }: { icon: LucideIcon; label: string; children: React.ReactNode }) {
   return (
@@ -45,7 +46,7 @@ export function AgencyProfilePage() {
         <div className="h-28 bg-linear-to-r from-primary to-chart-2/80 dark:from-primary/45 dark:to-chart-2/20" />
         <div className="flex flex-col gap-4 px-6 pb-6">
           <Avatar className="-mt-10 size-20 rounded-2xl border-4 border-card bg-card shadow-md">
-            {agency.logo && <AvatarImage src={agency.logo} alt="" className="rounded-2xl object-contain p-1" />}
+            {agency.logo && <AvatarImage src={fileUrl(agency.logo)} alt="" className="rounded-2xl object-contain p-1" />}
             <AvatarFallback className="rounded-2xl bg-primary/10 text-2xl font-semibold text-primary">{agency.agencyName.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
           <div>

@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useTrainingPartner } from "./use-training-partner";
+import { fileUrl } from "@/lib/api/files";
 
 const OPTIONAL_FIELDS = ["educationQualification_1", "relevant_industryExperience"];
 const REQUIRED_FIELDS = ["name", "email", "phoneNumber", "PAN_CARD_NO", "AADHAR_NO", "state", "district", "city", "pincode"];
@@ -179,7 +180,7 @@ export function TrainersPage() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="size-8">
-                        {trainer.profilePic && <AvatarImage src={trainer.profilePic} alt="" />}
+                        {trainer.profilePic && <AvatarImage src={fileUrl(trainer.profilePic)} alt="" />}
                         <AvatarFallback className="text-xs">{trainer.name.slice(0, 2).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <div>

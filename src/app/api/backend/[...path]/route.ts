@@ -36,6 +36,12 @@ async function forward(request: NextRequest, ctx: RouteContext<"/api/backend/[..
   const responseHeaders = new Headers();
   const responseType = backendResponse.headers.get("content-type");
   if (responseType) responseHeaders.set("content-type", responseType);
+  // signed file links (/files/view) answer with a redirect the browser has to follow itself
+  const location = backendResponse.headers.get("location");
+  if (location && backendResponse.status >= 300 && backendResponse.status < 400) {
+    responseHeaders.set("location", location);
+    responseHeaders.set("cache-control", "private, no-store");
+  }
   return new Response(backendResponse.body, { status: backendResponse.status, headers: responseHeaders });
 }
 

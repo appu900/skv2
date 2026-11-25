@@ -49,6 +49,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { MarksDialog } from "./marks-dialog";
+import { fileUrl } from "@/lib/api/files";
 
 const initials = (name: string) =>
   name
@@ -250,9 +251,9 @@ function PhotosCard({ exam, locked }: { exam: Exam; locked: boolean }) {
         {images.length > 0 ? (
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
             {images.map((src) => (
-              <a key={src} href={src} target="_blank" rel="noreferrer" className="aspect-square overflow-hidden rounded-lg border bg-muted">
+              <a key={src} href={fileUrl(src)} target="_blank" rel="noreferrer" className="aspect-square overflow-hidden rounded-lg border bg-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element -- uploaded photo on S3 */}
-                <img src={src} alt="" className="size-full object-cover transition-transform hover:scale-105" />
+                <img src={fileUrl(src)} alt="" className="size-full object-cover transition-transform hover:scale-105" />
               </a>
             ))}
           </div>
@@ -458,7 +459,7 @@ export function ExamDetailPage({ id, admin }: { id: string; admin?: boolean }) {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="size-10 rounded-lg">
-                          {student.profilepic && <AvatarImage src={student.profilepic} alt="" className="rounded-lg object-cover" />}
+                          {student.profilepic && <AvatarImage src={fileUrl(student.profilepic)} alt="" className="rounded-lg object-cover" />}
                           <AvatarFallback className="rounded-lg bg-primary/10 text-xs font-semibold text-primary">{initials(student.name)}</AvatarFallback>
                         </Avatar>
                         <div>

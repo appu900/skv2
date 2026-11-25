@@ -19,6 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { fileUrl } from "@/lib/api/files";
 
 function CreateSchemeDialog() {
   // multipart: the logo file goes up as "image", the rest as text fields
@@ -79,7 +80,7 @@ export function SchemesPage() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="size-9 rounded-md">
-                        {scheme.logo && <AvatarImage src={scheme.logo} alt="" className="object-contain" />}
+                        {scheme.logo && <AvatarImage src={fileUrl(scheme.logo)} alt="" className="object-contain" />}
                         <AvatarFallback className="rounded-md text-xs">{scheme.code.slice(0, 3)}</AvatarFallback>
                       </Avatar>
                       <div>

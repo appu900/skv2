@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAgency } from "./use-agency";
+import { fileUrl } from "@/lib/api/files";
 
 const TEXT_FIELDS = [
   "name", "email", "phoneNumber", "assesoraId", "panNumber", "adharNumber", "sector", "courseCode",
@@ -159,7 +160,7 @@ export function AssessorsPage() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="size-9">
-                        {assessor.profilePic && <AvatarImage src={assessor.profilePic} alt="" className="object-cover" />}
+                        {assessor.profilePic && <AvatarImage src={fileUrl(assessor.profilePic)} alt="" className="object-cover" />}
                         <AvatarFallback className="text-xs">{assessor.name.slice(0, 2).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <div>
