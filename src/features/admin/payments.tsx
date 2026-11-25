@@ -58,7 +58,7 @@ function ConfirmPaymentButton({ batch }: { batch: Batch }) {
     <ConfirmDialog
       trigger={<Button size="sm">Confirm</Button>}
       title="Confirm this payment?"
-      description={`${formatCurrency(batch.amountToPaid)} from ${batch.trainingOrganization}, transaction ${batch.transactionId || "—"}. The batch can then be assigned to an assessment agency.`}
+      description={`${formatCurrency(batch.amountToPaid)} from ${batch.trainingOrganization}, transaction ${batch.transactionId || "—"}. CUTM can then start its assessment.`}
       confirmLabel="Confirm payment"
       onConfirm={() => confirm.mutateAsync(undefined)}
     />

@@ -24,6 +24,7 @@ import type { Assessor, Batch, Course, Exam, Student } from "@/lib/api/models";
 import { useApiMutation } from "@/lib/api/use-api-mutation";
 import { useItem } from "@/lib/api/use-item";
 import { useList } from "@/lib/api/use-list";
+import type { OfflineAssessor } from "@/lib/api/offline";
 import { refId } from "@/lib/domain/refs";
 import { examStage } from "@/lib/domain/stages";
 import { cn } from "@/lib/utils";
@@ -103,8 +104,8 @@ function Journey({ exam, students }: { exam: Exam; students: Student[] }) {
 
 // ---------------------------------------------------------------- setup
 
-function SetupCard({ exam, assessors, students, locked }: { exam: Exam; assessors: Assessor[]; students: Student[]; locked: boolean }) {
-  const [assessorId, setAssessorId] = useState(refId(exam.AssessorId) ?? "");
+function SetupCard({ exam, assessors, students, locked, currentAssessorId, assessorsHref }: { exam: Exam; assessors: Assessor[]; students: Student[]; locked: boolean; currentAssessorId?: string; assessorsHref: string }) {
+  const [assessorId, setAssessorId] = useState(currentAssessorId ?? "");
   const [date, setDate] = useState(toInputDate(exam.assesmentdate));
   const presentByFlags = students.filter((student) => !student.absent).length;
   const [present, setPresent] = useState(String(exam.presentStudents ?? presentByFlags));
@@ -142,14 +143,14 @@ function SetupCard({ exam, assessors, students, locked }: { exam: Exam; assessor
               variant="outline"
               size="icon"
               aria-label="Save assessor"
-              disabled={locked || !assessorId || assessorId === refId(exam.AssessorId) || assign.isPending}
+              disabled={locked || !assessorId || assessorId === currentAssessorId || assign.isPending}
               onClick={() => assign.mutate(assessorId)}
             >
               {assign.isPending ? <Loader2 className="animate-spin" /> : <Save />}
             </Button>
           </div>
           {assessors.length === 0 && (
-            <Link href="/aa/assessors" className="text-xs text-primary hover:underline">
+            <Link href={assessorsHref} className="text-xs text-primary hover:underline">
               Add an assessor
             </Link>
           )}
@@ -313,15 +314,28 @@ function SubmitResults({ exam, pending }: { exam: Exam; pending: number }) {
 
 // ---------------------------------------------------------------- page
 
-export function ExamDetailPage({ id }: { id: string }) {
+// Used by the agency portal and by the admin for assessments CUTM conducts itself (no agency on the exam).
+export function ExamDetailPage({ id, admin }: { id: string; admin?: boolean }) {
   const { data: exam, isLoading, isError } = useItem<Exam>(`/exam/${id}`);
   const aaId = refId(exam?.assesmentAgencyId);
-  const assessors = useList<Assessor>(aaId ? `/assessor/aa/${aaId}` : null);
+  const cutm = Boolean(exam) && !aaId;
+  const agencyAssessors = useList<Assessor>(aaId ? `/assessor/aa/${aaId}` : null);
+  const cutmAssessors = useList<OfflineAssessor>(admin && cutm ? "/offline/admin/assessors" : null);
+  const assessors = {
+    data: cutm
+      ? (cutmAssessors.data ?? [])
+          .filter((item) => item.status === "active")
+          .map((item) => ({ _id: item._id, name: item.name, assesoraId: item.assessorCode, phoneNumber: item.mobile }) as unknown as Assessor)
+      : agencyAssessors.data,
+  };
+  const currentAssessorId = cutm ? (exam?.cutmAssessorId ?? undefined) : refId(exam?.AssessorId);
+  const examsHref = admin ? "/admin/exams" : "/aa/exams";
+  const assessorsHref = admin ? "/admin/offline/assessors" : "/aa/assessors";
   const courses = useList<Course>("/course/course");
   const [search, setSearch] = useState("");
 
   if (isError || (!isLoading && !exam)) {
-    return <EmptyState icon={Building2} title="Exam not found" description="It may not be assigned to your agency." />;
+    return <EmptyState icon={Building2} title="Exam not found" description={admin ? "It may have been removed." : "It may not be assigned to your agency."} />;
   }
   if (isLoading || !exam) {
     return (
@@ -339,13 +353,13 @@ export function ExamDetailPage({ id }: { id: string }) {
   const absent = students.filter((student) => student.absent).length;
   const marked = students.filter((student) => student.markUploadStatus).length;
   const pending = students.length - absent - marked;
-  const assessor = (assessors.data ?? []).find((item) => item._id === refId(exam.AssessorId));
+  const assessor = (assessors.data ?? []).find((item) => item._id === currentAssessorId);
   const shown = students.filter((student) => matches(search, student.name, student.MPR_Id, student.redg_No));
 
   return (
     <div className="flex flex-col gap-6">
       <Button variant="ghost" size="sm" asChild className="-ml-2 w-fit text-muted-foreground">
-        <Link href="/aa/exams">
+        <Link href={examsHref}>
           <ArrowLeft />
           All exams
         </Link>
@@ -409,7 +423,7 @@ export function ExamDetailPage({ id }: { id: string }) {
         <StatCard label="Assessor" value={assessor ? "Assigned" : "—"} hint={assessor ? `${assessor.name} · ${assessor.phoneNumber}` : "Not assigned yet"} icon={UserRound} tone={assessor ? "success" : "warning"} />
       </StatGrid>
 
-      <SetupCard key={`${refId(exam.AssessorId)}-${exam.assesmentdate}-${exam.presentStudents}`} exam={exam} assessors={assessors.data ?? []} students={students} locked={locked} />
+      <SetupCard key={`${currentAssessorId}-${exam.assesmentdate}-${exam.presentStudents}`} exam={exam} assessors={assessors.data ?? []} students={students} locked={locked} currentAssessorId={currentAssessorId} assessorsHref={assessorsHref} />
 
       <Card>
         <CardHeader>

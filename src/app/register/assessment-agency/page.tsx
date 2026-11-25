@@ -1,8 +1,6 @@
-import type { Metadata } from "next";
-import { AssessmentAgencyRegistration } from "@/features/register/assessment-agency-form";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Assessment agency registration" };
-
-export default function RegisterPage() {
-  return <AssessmentAgencyRegistration />;
+// No assessment agency in AMASY (client, 2026-11-24): CUTM assesses every batch itself.
+export default function Page() {
+  redirect("/register");
 }

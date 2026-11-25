@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import type { ApiErrorBody } from "./types";
+import { APPLICATION_NOT_APPROVED, type ApiErrorBody } from "./types";
 
 // All browser calls go through the Next.js proxy, which adds the session token.
 export const api = axios.create({ baseURL: "/api/backend" });
@@ -15,6 +15,14 @@ api.interceptors.response.use(
         // eslint-disable-next-line @next/next/no-location-assign-relative-destination
         window.location.href = `/login/${portal}?next=${encodeURIComponent(window.location.pathname)}`;
       }
+    }
+    // A training partner whose approval was withdrawn: end the session and show the status page.
+    if (error.response?.status === 403 && error.response.data?.error === APPLICATION_NOT_APPROVED && typeof window !== "undefined") {
+      const status = (error.response.data as ApiErrorBody & { applicationStatus?: string }).applicationStatus ?? "Pending";
+      void fetch("/api/auth/logout", { method: "POST" }).finally(() => {
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+        window.location.href = `/application-status?status=${encodeURIComponent(status)}`;
+      });
     }
     return Promise.reject(error);
   }

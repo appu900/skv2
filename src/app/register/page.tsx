@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Building2, CircleCheck, ClipboardCheck } from "lucide-react";
+import { ArrowRight, Building2, CircleCheck } from "lucide-react";
 import { SiteHeader } from "@/components/public/site-header";
 
 export const metadata: Metadata = { title: "Register" };
@@ -11,16 +11,8 @@ const OPTIONS = [
     icon: Building2,
     title: "Training partner",
     description: "Organisations that train candidates at their centres and enrol them in batches.",
-    steps: "5 steps + review",
-    ready: ["Organisation PAN", "Registered office address", "Head and project contact details", "Sectors and courses you train in"],
-  },
-  {
-    href: "/register/assessment-agency",
-    icon: ClipboardCheck,
-    title: "Assessment agency",
-    description: "Agencies that assess trained candidates and upload their marks.",
-    steps: "6 steps + review",
-    ready: ["Company PAN and GSTIN", "NCVET recognition letter (PDF or image)", "Agency logo", "Bank details (optional)"],
+    steps: "4 steps + review",
+    ready: ["Organisation PAN", "The scheme you train under", "Registered office address", "Head and project contact details"],
   },
 ];
 

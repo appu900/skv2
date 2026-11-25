@@ -79,8 +79,9 @@ export async function POST(request: NextRequest) {
 
   const payload = await backendResponse.json().catch(() => ({}));
   if (!backendResponse.ok) {
+    // the code lets the form react, e.g. a training partner whose application is not approved yet
     return NextResponse.json(
-      { success: false, message: payload.message || "Login failed" },
+      { success: false, message: payload.message || "Login failed", error: payload.error, applicationStatus: payload.applicationStatus },
       { status: backendResponse.status }
     );
   }

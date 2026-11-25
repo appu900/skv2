@@ -20,6 +20,8 @@ export interface RoleConfig {
   registerPath?: string;
   /** Portal has a "forgot password" flow (/forgot-password?portal=<slug>). */
   forgotPassword?: boolean;
+  /** Not offered on the portal chooser (assessment agencies are not used in AMASY; CUTM assesses). */
+  hidden?: boolean;
 }
 
 export const ROLE_CONFIG: Record<PortalSlug, RoleConfig> = {
@@ -47,7 +49,7 @@ export const ROLE_CONFIG: Record<PortalSlug, RoleConfig> = {
     description: "Assessments, marks, assessors and invoices",
     loginPath: "/aa/login",
     emailField: "email",
-    registerPath: "/register/assessment-agency",
+    hidden: true,
   },
   sna: {
     role: "SNA",

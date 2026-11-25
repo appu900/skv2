@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Building2, Check, KeyRound, MailCheck, MapPin, SearchCheck, Users, type LucideIcon } from "lucide-react";
 import { api } from "@/lib/api/client";
@@ -11,6 +12,7 @@ import { Field, SelectField, TextareaField } from "@/components/shared/field";
 import { PATTERNS, PasswordFields, validatePassword } from "@/components/register/common";
 import { FormSection, ReviewSection, StepForm, valueOf, type Step, type StepValues } from "@/components/register/step-form";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 const CATEGORIES = ["Private", "Government", "Public sector undertaking", "NGO / Trust / Society", "Educational institution", "Corporate"];
 
@@ -41,6 +43,55 @@ function toPayload(values: StepValues, schemes: Scheme[]) {
 export const joined = (values: StepValues, keys: string[], separator = " · ") =>
   keys.map((key) => valueOf(values, key)).filter(Boolean).join(separator);
 
+const CORPORATE = "Corporate";
+
+// A corporate organisation always trains under the Corporate scheme; everyone else picks a government scheme.
+// The scheme is chosen here once and used for every centre and batch afterwards.
+function CategoryAndScheme({ values, schemes, loading }: { values: StepValues; schemes: Scheme[]; loading: boolean }) {
+  const [category, setCategory] = useState(valueOf(values, "organizationCategory") ?? "");
+  const [scheme, setScheme] = useState(valueOf(values, "scheme") ?? "");
+  const corporate = category === CORPORATE;
+  const corporateScheme = schemes.find((item) => item.schemeType === CORPORATE);
+  const governmentSchemes = schemes.filter((item) => item.schemeType !== CORPORATE);
+
+  return (
+    <>
+      <SelectField
+        label="Category"
+        name="organizationCategory"
+        required
+        options={CATEGORIES}
+        value={category}
+        onValueChange={(next) => {
+          setCategory(next);
+          if ((next === CORPORATE) !== corporate) setScheme("");
+        }}
+      />
+      {corporate ? (
+        <div className="flex flex-col gap-2">
+          <Label>
+            Scheme<span className="text-destructive">*</span>
+          </Label>
+          <input type="hidden" name="scheme" value={corporateScheme?.name ?? CORPORATE} />
+          <p className="flex h-9 items-center rounded-md border bg-muted px-3 text-sm">{corporateScheme?.name ?? CORPORATE}</p>
+          <p className="text-xs text-muted-foreground">Corporate organisations train under the Corporate scheme; the LC/RC approves your centres.</p>
+        </div>
+      ) : (
+        <SelectField
+          label="Scheme"
+          name="scheme"
+          required
+          value={scheme}
+          onValueChange={setScheme}
+          placeholder={loading ? "Loading…" : category ? "Select…" : "Pick the category first"}
+          options={governmentSchemes.map((item) => ({ value: item.name, label: `${item.name} · ${item.schemeType}` }))}
+          hint="Decides the fee per candidate and who approves your centres. It cannot be changed later."
+        />
+      )}
+    </>
+  );
+}
+
 export function TrainingPartnerRegistration() {
   const schemes = useList<Scheme>("/scheme");
   const schemeList = schemes.data ?? [];
@@ -55,21 +106,13 @@ export function TrainingPartnerRegistration() {
         <>
           <FormSection title="About the organisation">
             <Field label="Organisation name" name="organizationName" required defaultValue={v(values, "organizationName")} className="sm:col-span-2" placeholder="As registered" />
-            <SelectField label="Category" name="organizationCategory" required options={CATEGORIES} defaultValue={v(values, "organizationCategory")} />
+            <CategoryAndScheme values={values} schemes={schemeList} loading={schemes.isLoading} />
             <Field label="Date of incorporation" name="dateOfIncorporation" type="date" defaultValue={v(values, "dateOfIncorporation")} />
             <Field label="Affiliation" name="affiliation" defaultValue={v(values, "affiliation")} placeholder="e.g. NSDC" />
             <Field label="PAN" name="pan" required {...PATTERNS.pan} defaultValue={v(values, "pan")} placeholder="ABCDE1234F" />
             <Field label="PRN number" name="prnNo" defaultValue={v(values, "prnNo")} />
           </FormSection>
-          <FormSection title="Scheme" description="The scheme decides the fee per candidate and who approves your centres.">
-            <SelectField
-              label="Scheme"
-              name="scheme"
-              required
-              defaultValue={v(values, "scheme")}
-              placeholder={schemes.isLoading ? "Loading…" : "Select…"}
-              options={schemeList.map((scheme) => ({ value: scheme.name, label: `${scheme.name} · ${scheme.schemeType}` }))}
-            />
+          <FormSection title="Centre ID">
             <Field label="Centre / TC ID" name="centerId" required defaultValue={v(values, "centerId")} hint="ID issued to you by the scheme" />
           </FormSection>
         </>

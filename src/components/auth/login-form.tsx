@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { ArrowRight, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import { ROLE_CONFIG, type PortalSlug } from "@/lib/auth/roles";
 import { getErrorMessage } from "@/lib/api/client";
+import { APPLICATION_NOT_APPROVED, type ApiErrorBody } from "@/lib/api/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,6 +39,11 @@ export function LoginForm({ portal }: { portal: PortalSlug }) {
       // only follow redirects that stay inside this portal
       router.replace(next && next.startsWith(`/${portal}`) ? next : `/${portal}`);
     } catch (error) {
+      const body = axios.isAxiosError<ApiErrorBody & { applicationStatus?: string }>(error) ? error.response?.data : undefined;
+      if (body?.error === APPLICATION_NOT_APPROVED) {
+        router.replace(`/application-status?status=${encodeURIComponent(body.applicationStatus ?? "Pending")}`);
+        return;
+      }
       toast.error(getErrorMessage(error));
       setSubmitting(false);
     }

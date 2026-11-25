@@ -23,7 +23,9 @@ export default function LoginChooserPage() {
         <h2 className="font-display text-[32px] leading-tight font-medium tracking-[-0.045em]">Choose your portal</h2>
         <p className="mt-1 text-sm text-muted-foreground">Pick the portal of your organisation to sign in.</p>
         <div className="mt-8 flex flex-col gap-3">
-          {Object.values(ROLE_CONFIG).map((config) => {
+          {Object.values(ROLE_CONFIG)
+            .filter((config) => !config.hidden)
+            .map((config) => {
             const Icon = PORTAL_INFO[config.slug].icon;
             return (
               <Link
@@ -44,7 +46,7 @@ export default function LoginChooserPage() {
           })}
         </div>
         <p className="mt-8 text-center text-sm text-muted-foreground">
-          New training partner or assessment agency?{" "}
+          New training partner?{" "}
           <Link href="/register" className="font-medium text-primary hover:underline">
             Apply here
           </Link>

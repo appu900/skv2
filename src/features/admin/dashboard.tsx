@@ -4,7 +4,7 @@ import { AdminInsights } from "./insights";
 import Link from "next/link";
 import { Award, Building2, CalendarCheck, ClipboardCheck, Inbox, Landmark, MapPinned, Wallet, Coins } from "lucide-react";
 import { useList } from "@/lib/api/use-list";
-import type { AssessmentAgency, Batch, TrainingPartner } from "@/lib/api/models";
+import type { Batch, Exam, TrainingPartner } from "@/lib/api/models";
 import { formatCurrency, formatDate } from "@/lib/domain/stages";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { StatCard, StatGrid } from "@/components/dashboard/stat-card";
@@ -29,7 +29,8 @@ function RowsSkeleton() {
 
 export function AdminDashboard() {
   const pendingTps = useList<TrainingPartner>("/tp/status/pending");
-  const pendingAas = useList<AssessmentAgency>("/aa/status/pending");
+  const exams = useList<Exam>("/exam/all");
+  const running = (exams.data ?? []).filter((exam) => !exam.markUploadAndExamCompleteStatus);
   const payments = useList<Batch>("/batch/all/paymentnotification");
   const corporate = useList<Batch>("/batch/all/corporate");
 
@@ -41,7 +42,7 @@ export function AdminDashboard() {
           <Button asChild>
             <Link href="/admin/exams">
               <CalendarCheck />
-              Assign exam
+              Start assessment
             </Link>
           </Button>
         }
@@ -49,7 +50,7 @@ export function AdminDashboard() {
 
       <StatGrid>
         <StatCard label="Training partner applications" value={pendingTps.data?.length} hint="Waiting for review" icon={Building2} href="/admin/training-partners" loading={pendingTps.isLoading} />
-        <StatCard label="Agency applications" value={pendingAas.data?.length} hint="Waiting for review" icon={ClipboardCheck} tone="info" href="/admin/assessment-agencies" loading={pendingAas.isLoading} />
+        <StatCard label="Assessments running" value={running.length} hint="Marks and sheets still to record" icon={ClipboardCheck} tone="info" href="/admin/exams" loading={exams.isLoading} />
         <StatCard label="Payments to confirm" value={payments.data?.length} hint="Proof uploaded by training partners" icon={Wallet} tone="warning" href="/admin/payments" loading={payments.isLoading} />
         <StatCard label="Corporate fees to set" value={corporate.data?.length} hint="Submitted corporate batches" icon={Coins} tone="success" href="/admin/payments" loading={corporate.isLoading} />
       </StatGrid>
@@ -65,9 +66,6 @@ export function AdminDashboard() {
               <TabsList>
                 <TabsTrigger value="tp">
                   Training partners <Badge variant="secondary">{pendingTps.data?.length ?? 0}</Badge>
-                </TabsTrigger>
-                <TabsTrigger value="aa">
-                  Agencies <Badge variant="secondary">{pendingAas.data?.length ?? 0}</Badge>
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="tp" className="mt-4">
@@ -98,39 +96,13 @@ export function AdminDashboard() {
                   </Table>
                 )}
               </TabsContent>
-              <TabsContent value="aa" className="mt-4">
-                {pendingAas.isLoading ? (
-                  <RowsSkeleton />
-                ) : !pendingAas.data?.length ? (
-                  <EmptyState icon={Inbox} title="No pending applications" description="New assessment agency sign-ups appear here." />
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Agency</TableHead>
-                        <TableHead className="hidden md:table-cell">Email</TableHead>
-                        <TableHead className="text-right">Applied</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {pendingAas.data.slice(0, 6).map((aa) => (
-                        <TableRow key={aa._id}>
-                          <TableCell className="font-medium">{aa.agencyName}</TableCell>
-                          <TableCell className="hidden md:table-cell">{aa.email || "—"}</TableCell>
-                          <TableCell className="text-right text-muted-foreground">{formatDate(aa.createdAt)}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </TabsContent>
             </Tabs>
           </CardContent>
         </Card>
 
         <QuickActions
           actions={[
-            { title: "Assign an exam", description: "Send a paid batch to an agency", href: "/admin/exams", icon: CalendarCheck },
+            { title: "Start an assessment", description: "CUTM assesses a paid batch", href: "/admin/exams", icon: CalendarCheck },
             { title: "Publish certificates", description: "For completed assessments", href: "/admin/certificates", icon: Award },
             { title: "Create a scheme", description: "Logo, type and price per candidate", href: "/admin/schemes", icon: Landmark },
             { title: "Add an SNA account", description: "State nodal agency login", href: "/admin/sna", icon: MapPinned },

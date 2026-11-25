@@ -7,8 +7,8 @@ import { ROLE_CONFIG } from "@/lib/auth/roles";
 
 const STEPS = [
   { title: "Train", who: "Training partner", text: "Candidates are enrolled in a batch at an approved training centre." },
-  { title: "Approve", who: "State nodal agency", text: "For government schemes, the state approves the centre and then the batch." },
-  { title: "Assess", who: "Assessment agency", text: "Every candidate is examined in theory, practical and viva, and the marks are uploaded." },
+  { title: "Approve", who: "State nodal agency", text: "For government schemes, the state approves the training centre." },
+  { title: "Assess", who: "CUTM Awarding Body", text: "Every candidate is examined in theory, practical and viva by CUTM assessors, and the marks are recorded." },
   { title: "Certify", who: "Awarding body", text: "Candidates who pass receive a certificate with a number anyone can verify." },
 ];
 
@@ -68,7 +68,7 @@ export default function HomePage() {
             Issued by <span className="font-semibold">CUTM Awarding Body</span> <span className="text-[#8a8a8a]">for state, central and corporate skill schemes</span>
           </p>
           <p className={`mx-auto mt-5 max-w-[40rem] ${body}`}>
-            Training partners enrol candidates, state agencies approve their batches, assessment agencies examine every candidate, and those who pass
+            Training partners enrol candidates, state agencies approve their centres, CUTM assesses every candidate, and those who pass
             receive a certificate anyone can verify. One platform runs the whole journey.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
@@ -139,17 +139,14 @@ export default function HomePage() {
         {/* apply */}
         <section className="px-5 py-24 sm:py-32">
           <div className="mx-auto max-w-6xl rounded-3xl bg-[#e4fa5c] px-6 py-16 text-center sm:px-12 sm:py-24">
-            <h2 className={`mx-auto max-w-3xl text-[36px] leading-[1.08] sm:text-[56px] ${display}`}>Train or assess with the awarding body</h2>
+            <h2 className={`mx-auto max-w-3xl text-[36px] leading-[1.08] sm:text-[56px] ${display}`}>Train with the awarding body</h2>
             <p className="mx-auto mt-5 max-w-xl text-[17px] leading-[1.65] text-black/75">
-              Training partners and assessment agencies apply online. Applications are reviewed by the awarding body, and your progress is saved as you
+              Training partners apply online. Applications are reviewed by the awarding body, and your progress is saved as you
               go.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
               <Link href="/register/training-partner" className={solidButton}>
                 Apply as a training partner
-              </Link>
-              <Link href="/register/assessment-agency" className={`${outlineButton} bg-transparent`}>
-                Apply as an assessment agency
               </Link>
             </div>
           </div>

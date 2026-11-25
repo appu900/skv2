@@ -14,7 +14,6 @@ import {
   Building2,
   CalendarCheck,
   ChartColumn,
-  ClipboardCheck,
   Landmark,
   Layers,
   LayoutDashboard,
@@ -57,7 +56,6 @@ export const NAVIGATION: Record<PortalSlug, NavSection[]> = {
       title: "Approvals",
       items: [
         { title: "Training partners", href: "/admin/training-partners", icon: Building2, summary: "Review, approve or reject training partner applications and set corporate fees." },
-        { title: "Assessment agencies", href: "/admin/assessment-agencies", icon: ClipboardCheck, summary: "Review, approve or reject assessment agencies and set their payment percentage." },
       ],
     },
     {
@@ -65,10 +63,9 @@ export const NAVIGATION: Record<PortalSlug, NavSection[]> = {
       items: [
         { title: "Batches", href: "/admin/batches", icon: Layers, summary: "All batches with filters by state, sector, course and training partner." },
         { title: "Payments", href: "/admin/payments", icon: Wallet, summary: "Confirm corporate and government batch payments, set corporate amounts." },
-        { title: "Exams", href: "/admin/exams", icon: CalendarCheck, summary: "Assign paid batches to assessment agencies and follow exam progress." },
+        { title: "Assessments", href: "/admin/exams", icon: CalendarCheck, summary: "CUTM assesses paid batches: assessor, attendance, marks and sheets." },
         { title: "Certificates", href: "/admin/certificates", icon: Award, summary: "Publish certificates for completed exams and follow the generation job." },
         { title: "Batch invoices", href: "/admin/batch-invoices", icon: Receipt, summary: "Payment invoices issued to training partners for submitted batches." },
-        { title: "Agency invoices", href: "/admin/invoices", icon: Receipt, summary: "Monthly assessment agency invoices and their payment status." },
       ],
     },
     {

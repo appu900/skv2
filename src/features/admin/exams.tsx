@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { CalendarCheck, FileText, Plus } from "lucide-react";
 import { api } from "@/lib/api/client";
-import type { AssessmentAgency, Batch, Exam } from "@/lib/api/models";
+import type { Batch, Exam } from "@/lib/api/models";
 import { useApiMutation } from "@/lib/api/use-api-mutation";
 import { useList } from "@/lib/api/use-list";
 import { examStage } from "@/lib/domain/stages";
 import { PageHeader } from "@/components/portal/page-header";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { DetailList } from "@/components/shared/detail-list";
 import { SelectField } from "@/components/shared/field";
 import { FileLink } from "@/components/shared/file-link";
@@ -18,41 +18,31 @@ import { LoadingRows } from "@/components/shared/loading-rows";
 import { SearchInput, matches } from "@/components/shared/search-input";
 import { StageBadge } from "@/components/dashboard/stage-badge";
 import { EmptyState } from "@/components/dashboard/empty-state";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-function AssignExamDialog() {
+// No assessment agency in AMASY (client, 2026-11-24): CUTM conducts every assessment itself.
+function StartAssessmentDialog() {
   const batches = useList<Batch>("/batch");
-  const agencies = useList<AssessmentAgency>("/aa/status/approved");
   const [batchId, setBatchId] = useState("");
   const eligible = (batches.data ?? []).filter((batch) => batch.paymentStatus && !batch.isAssigned);
   const selected = eligible.find((batch) => batch._id === batchId);
 
-  const assign = useApiMutation(
-    (body: { batchId: string; assesmentAgencyId: string; courseName?: string }) => api.post("/exam/create", body),
-    "Exam assigned"
-  );
+  const start = useApiMutation((body: { batchId: string; courseName?: string }) => api.post("/exam/create", body), "Assessment opened");
 
   return (
     <FormDialog
       trigger={
         <Button>
           <Plus />
-          Assign exam
+          Start assessment
         </Button>
       }
-      title="Assign an exam"
-      description="Only submitted batches with a confirmed payment that have no exam yet are listed."
-      submitLabel="Assign"
-      onSubmit={(form) =>
-        assign.mutateAsync({
-          batchId: String(form.get("batchId")),
-          assesmentAgencyId: String(form.get("assesmentAgencyId")),
-          courseName: selected?.courseName,
-        })
-      }
+      title="Start an assessment"
+      description="CUTM conducts the assessment. Only submitted batches with a confirmed payment that have no assessment yet are listed."
+      submitLabel="Start assessment"
+      onSubmit={(form) => start.mutateAsync({ batchId: String(form.get("batchId")), courseName: selected?.courseName })}
     >
       <SelectField
         label="Batch"
@@ -78,13 +68,6 @@ function AssignExamDialog() {
           />
         </div>
       )}
-      <SelectField
-        label="Assessment agency"
-        name="assesmentAgencyId"
-        required
-        placeholder="Select an approved agency"
-        options={(agencies.data ?? []).map((aa) => ({ value: aa._id, label: aa.agencyName }))}
-      />
     </FormDialog>
   );
 }
@@ -115,7 +98,7 @@ function ExamDocuments({ exam }: { exam: Exam }) {
               ["Scheme", exam.scheme],
               ["Assessment date", exam.assesmentdate || "Not scheduled"],
               ["Candidates", `${exam.presentStudents ?? "—"} present of ${exam.totalStudents ?? 0}`],
-              ["Agency paid", exam.paymentStatus ? "Yes" : "No"],
+              ["Assessor", exam.cutmAssessorName || "Not assigned"],
               ["Certificates", exam.certificateIssued ? `${exam.certificatesIssuedCount ?? 0} issued` : "Not published"],
             ]}
           />
@@ -142,7 +125,6 @@ function ExamDocuments({ exam }: { exam: Exam }) {
 export function ExamsPage() {
   const [search, setSearch] = useState("");
   const { data = [], isLoading } = useList<Exam>("/exam/all");
-  const markPaid = useApiMutation((id: string) => api.put(`/exam/paymentstatus/${id}`), "Marked as paid");
 
   const rows = data.filter((exam) =>
     matches(search, exam.batchABN, exam.course, exam.TrainingOrganization, exam.assesmentAgency)
@@ -150,18 +132,18 @@ export function ExamsPage() {
 
   return (
     <>
-      <PageHeader title="Exams" description="Assign paid batches to assessment agencies and follow progress." actions={<AssignExamDialog />} />
-      <ListCard toolbar={<SearchInput value={search} onChange={setSearch} placeholder="Search ABN, course, partner, agency…" />}>
+      <PageHeader title="Assessments" description="CUTM assesses every paid batch: assign a CUTM assessor, record attendance and marks, then publish." actions={<StartAssessmentDialog />} />
+      <ListCard toolbar={<SearchInput value={search} onChange={setSearch} placeholder="Search ABN, course, partner…" />}>
         {isLoading ? (
           <LoadingRows />
         ) : rows.length === 0 ? (
-          <EmptyState icon={CalendarCheck} title="No exams yet" description="Assign a paid batch to an agency to create one." />
+          <EmptyState icon={CalendarCheck} title="No assessments yet" description="Start one for a paid batch." />
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Batch</TableHead>
-                <TableHead className="hidden md:table-cell">Agency</TableHead>
+                <TableHead className="hidden md:table-cell">Assessor</TableHead>
                 <TableHead className="hidden lg:table-cell">Date</TableHead>
                 <TableHead className="hidden sm:table-cell">Present</TableHead>
                 <TableHead>Stage</TableHead>
@@ -177,7 +159,7 @@ export function ExamsPage() {
                       {exam.batchABN} · {exam.TrainingOrganization}
                     </p>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">{exam.assesmentAgency}</TableCell>
+                  <TableCell className="hidden md:table-cell">{exam.cutmAssessorName || <span className="text-muted-foreground">Not assigned</span>}</TableCell>
                   <TableCell className="hidden text-muted-foreground lg:table-cell">{exam.assesmentdate || "Not set"}</TableCell>
                   <TableCell className="hidden tabular-nums sm:table-cell">
                     {exam.presentStudents ?? "—"}/{exam.totalStudents ?? 0}
@@ -188,25 +170,9 @@ export function ExamsPage() {
                   <TableCell>
                     <div className="flex justify-end gap-1">
                       <ExamDocuments exam={exam} />
-                      {exam.paymentStatus ? (
-                        <Badge variant="success" className="self-center">
-                          Agency paid
-                        </Badge>
-                      ) : (
-                        exam.markUploadAndExamCompleteStatus && (
-                          <ConfirmDialog
-                            trigger={
-                              <Button variant="outline" size="sm">
-                                Mark paid
-                              </Button>
-                            }
-                            title="Mark the agency as paid for this exam?"
-                            description="Usually this happens automatically when the monthly invoice is paid."
-                            confirmLabel="Mark paid"
-                            onConfirm={() => markPaid.mutateAsync(exam._id)}
-                          />
-                        )
-                      )}
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href={`/admin/exams/${exam._id}`}>{exam.markUploadAndExamCompleteStatus ? "Open" : "Conduct"}</Link>
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>

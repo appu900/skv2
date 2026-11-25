@@ -211,6 +211,9 @@ export interface Exam {
   presentStudents?: number;
   perStudentCost?: number;
   AssessorId?: unknown;
+  // CUTM-conducted exams (no assessment agency): the CUTM assessor
+  cutmAssessorId?: string | null;
+  cutmAssessorName?: string | null;
   attendanceSheet?: string;
   resultSheet?: string;
   images?: string[];
